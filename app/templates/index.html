@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Concept Graph Tool</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+<h1>Concept Graph Tool</h1>
+<form id="topicForm">
+    <input type="text" id="topic" name="topic" placeholder="Enter a topic" required>
+    <button type="submit">Generate Tree</button>
+</form>
+<div id="treePlot"></div>
+
+<script>
+        document.getElementById("topicForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const topic = document.getElementById("topic").value;
+            const response = await fetch('/api/generate_tree', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ topic })
+            });
+            const data = await response.json();
+            Plotly.newPlot("treePlot", data.data, data.layout);
+        };
+    </script>
+</body>
+</html>
