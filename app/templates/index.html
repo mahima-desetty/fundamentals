@@ -8,19 +8,25 @@
 <h1>Concept Graph Tool</h1>
 <form id="topicForm">
     <input type="text" id="topic" name="topic" placeholder="Enter a topic" required>
+    <input type="number" id="number" name="number" placeholder="Optional number of concepts?">
     <button type="submit">Generate Tree</button>
 </form>
+<button id="zoomOutButton" style="display: none;">Zoom Out</button>
 <div id="treePlot"></div>
 
 <script>
         document.getElementById("topicForm").onsubmit = async (e) => {
             e.preventDefault();
             const topic = document.getElementById("topic").value;
+            const number = document.getElementById("number").value;
+            const requestObj = {topic: topic, number: number}
+
             const response = await fetch('/api/generate_tree', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic })
+                body: JSON.stringify(requestObj)
             });
+
             const data = await response.json();
             Plotly.newPlot("treePlot", data.data, data.layout);
         };
