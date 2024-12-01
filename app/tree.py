@@ -13,6 +13,13 @@ def build_concept_tree(topic, llm_response):
     return tree
 
 
+# def build_subgraph(parent_graph, node):
+#     """Create a subgraph centered on the clicked node."""
+#     sub_nodes = list(nx.descendants(parent_graph, node))
+#     sub_nodes.append(node)  # Include the clicked node
+#     return parent_graph.subgraph(sub_nodes)
+
+
 def plot_tree(tree, node_data):
     """Create a Plotly figure for the NetworkX tree."""
     pos = nx.spring_layout(tree, scale=3)  # Generate positions for nodes
@@ -46,9 +53,9 @@ def plot_tree(tree, node_data):
         x=x_nodes,
         y=y_nodes,
         mode='markers+text',
-        text=nodes,
+        text=[node for node in tree.nodes()],  # Use node ID as text
         textfont=dict(size=14, color="black"),  # Inside node labels
-        textposition="middle center",
+        textposition="top center",
         marker=dict(
             size=30,  # Bigger nodes
             color="#007aff",  # Sleek blue nodes
@@ -69,6 +76,8 @@ def plot_tree(tree, node_data):
         plot_bgcolor="white",
         font=dict(color="black", size=18, family="Times New Roman"),
         margin=dict(l=50, r=50, t=50, b=50),  # Slim margins
-        autosize=True,  # Ensure responsiveness
+        autosize=True,  # Ensure responsiveness,
+        hovermode="closest",
+        clickmode="select+event"
     )
     return fig

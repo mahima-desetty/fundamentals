@@ -32,9 +32,7 @@ def generate_tree():
     if not number:
         number = 5
 
-    depth = data.get("depth", 0)
-    if depth > max_depth:
-        return jsonify({"error": "Max depth exceeded"}), 400
+    depth = 0
 
     response = client.chat.completions.create(
         model=model_choice,
@@ -57,3 +55,64 @@ def generate_tree():
     fig = plot_tree(tree, response_dictionary)
 
     return jsonify(fig.to_dict())
+
+
+@api_bp.route('/explore_node/<node_id>', methods=['POST'])
+def explore_node(node_id):
+    """
+    Explore a specific node and generate a subgraph for it.
+    """
+    if not graph_stack:
+        return jsonify({"error": "No graph to explore"}), 400
+
+    if len(graph_stack) > max_depth:
+        return jsonify({"error": "Max depth exceeded"}), 400
+
+    data = request.json
+    number = data.get("number", "5")
+    print(node_id)
+
+    # Get the current graph and build a subgraph
+    current_state = graph_stack[-1]
+    current_depth = current_state["depth"]
+    # parent_graph = current_state["tree"]
+
+    if current_depth > max_depth:
+        return jsonify({"error": "Max depth exceeded"}), 400
+
+    response = client.chat.completions.create(
+        model=model_choice,
+        messages=[
+            {"role": "system", "content": create_model_instructions(number)},
+            {"role": "user", "content": f"Create a concept tree for: {node_id}"}
+        ]
+    )
+
+    llm_response = response.choices[0].message.content
+
+    # LLM was including Markdown syntax that needed to be manually removed.
+    cleaned_response = llm_response.strip().replace("```json", "").replace("```", "").strip()
+
+    response_dictionary = json.loads(cleaned_response)
+
+    # Parse response and build tree
+    # tree = build_subgraph(parent_graph, node_id)
+    tree = build_concept_tree(node_id, response_dictionary)
+
+    # Push the new subgraph state onto the stack
+    graph_stack.append({"topic": node_id, "tree": tree, "depth": current_depth+1})
+    fig = plot_tree(tree, response_dictionary)
+
+    return jsonify(fig.to_dict())
+
+
+# @api_bp.route('/api/zoom_out', methods=['POST'])
+# def zoom_out():
+#     """
+#     Zoom out to the previous graph in the stack.
+#     """
+#     if len(graph_stack) > 1:
+#         graph_stack.pop()
+#         parent_state = graph_stack[-1]
+#         return plot_tree(parent_state["graph"], parent_state["node_data"])
+#     return jsonify({"error": "No parent graph to return to"}), 400

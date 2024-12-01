@@ -11,25 +11,56 @@
     <input type="number" id="number" name="number" placeholder="Optional number of concepts?">
     <button type="submit">Generate Tree</button>
 </form>
-<button id="zoomOutButton" style="display: none;">Zoom Out</button>
 <div id="treePlot"></div>
 
 <script>
-        document.getElementById("topicForm").onsubmit = async (e) => {
-            e.preventDefault();
-            const topic = document.getElementById("topic").value;
-            const number = document.getElementById("number").value;
-            const requestObj = {topic: topic, number: number}
+    let currentNumber = null;
 
-            const response = await fetch('/api/generate_tree', {
+    async function registerPlotlyClickListener() {
+        const fig = document.getElementById("treePlot");
+
+        // Remove any existing listener to avoid duplicate event triggers
+        fig.removeAllListeners?.("plotly_click");
+
+        fig.on("plotly_click", async function(data) {
+            const node_id = data.points[0].text
+            const url = "/api/explore_node/" + node_id
+            console.log(url)
+
+            const explore_node_response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestObj)
+                body: JSON.stringify({number:number})
             });
 
-            const data = await response.json();
-            Plotly.newPlot("treePlot", data.data, data.layout);
-        };
-    </script>
+            const plotResponse = await explore_node_response.json();
+            console.log(plotResponse)
+            Plotly.newPlot("treePlot", plotResponse.data, plotResponse.layout);
+
+            // Re-register the click listener after re-rendering the plot
+            registerPlotlyClickListener();
+        });
+    }
+
+    document.getElementById("topicForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const topic = document.getElementById("topic").value;
+        const number = document.getElementById("number").value;
+        currentNumber = number; // Store the current number globally
+        const requestObj = {topic: topic, number: number}
+
+        const response = await fetch('/api/generate_tree', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestObj)
+        });
+
+        const data = await response.json();
+        Plotly.newPlot("treePlot", data.data, data.layout);
+
+        // Register the click listener for the first render
+        registerPlotlyClickListener();
+    };
+</script>
 </body>
 </html>
