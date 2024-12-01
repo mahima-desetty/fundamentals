@@ -13,13 +13,6 @@ def build_concept_tree(topic, llm_response):
     return tree
 
 
-# def build_subgraph(parent_graph, node):
-#     """Create a subgraph centered on the clicked node."""
-#     sub_nodes = list(nx.descendants(parent_graph, node))
-#     sub_nodes.append(node)  # Include the clicked node
-#     return parent_graph.subgraph(sub_nodes)
-
-
 def plot_tree(tree, node_data):
     """Create a Plotly figure for the NetworkX tree."""
     pos = nx.spring_layout(tree, scale=3)  # Generate positions for nodes

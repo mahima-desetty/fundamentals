@@ -54,7 +54,7 @@ def generate_tree():
 
     # Parse response and build tree
     tree = build_concept_tree(topic, response_dictionary)
-    graph_stack.append({"topic": topic, "tree": tree, "depth": depth})
+    graph_stack.append({"topic": topic, "tree": tree, "depth": depth, "node_data": response_dictionary})
     fig = plot_tree(tree, response_dictionary)
 
     return jsonify(fig.to_dict())
@@ -80,7 +80,6 @@ def explore_node(node_id):
     # Get the current graph and build a subgraph
     current_state = graph_stack[-1]
     current_depth = current_state["depth"]
-    # parent_graph = current_state["tree"]
 
     if current_depth >= max_depth:
         return jsonify({"error": "Maximum concept depth exceeded. Make sure you understand "
@@ -107,19 +106,22 @@ def explore_node(node_id):
     tree = build_concept_tree(node_id, response_dictionary)
 
     # Push the new subgraph state onto the stack
-    graph_stack.append({"topic": node_id, "tree": tree, "depth": current_depth+1})
+    graph_stack.append({"topic": node_id, "tree": tree,
+                        "depth": current_depth+1, "node_data": response_dictionary})
     fig = plot_tree(tree, response_dictionary)
 
     return jsonify(fig.to_dict())
 
 
-# @api_bp.route('/api/zoom_out', methods=['POST'])
-# def zoom_out():
-#     """
-#     Zoom out to the previous graph in the stack.
-#     """
-#     if len(graph_stack) > 1:
-#         graph_stack.pop()
-#         parent_state = graph_stack[-1]
-#         return plot_tree(parent_state["graph"], parent_state["node_data"])
-#     return jsonify({"error": "No parent graph to return to"}), 400
+@api_bp.route('/go_back', methods=['POST'])
+def go_back():
+    """
+    Go back to the previous graph in the stack.
+    """
+    if len(graph_stack) > 1:
+        graph_stack.pop()
+        parent_state = graph_stack[-1]
+        fig = plot_tree(parent_state["tree"], parent_state["node_data"])
+        return jsonify(fig.to_dict())
+    return jsonify({"error": "No parent graph to return to. Start by entering "
+                             "a concept in the topic box above."}), 400

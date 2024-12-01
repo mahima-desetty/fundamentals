@@ -12,6 +12,7 @@
     <button type="submit">Generate Tree</button>
 </form>
 <div id="treePlot"></div>
+<button id="goBack" onclick="goBack()">Go back</button>
 
 <script>
     let currentNumber = null;
@@ -65,6 +66,23 @@
         // Register the click listener for the first render
         registerPlotlyClickListener();
     };
+
+    async function goBack() {
+        const goBackResponse = await fetch('/api/go_back',  {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const parentGraphResponse = await goBackResponse.json();
+
+        if (parentGraphResponse.error) {
+            alert(parentGraphResponse.error);
+        } else {
+            Plotly.newPlot("treePlot", parentGraphResponse.data, parentGraphResponse.layout);
+            // Re-register the click listener after re-rendering the plot
+            registerPlotlyClickListener();
+        }
+    }
 </script>
 </body>
 </html>
