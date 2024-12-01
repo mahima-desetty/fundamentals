@@ -1,6 +1,6 @@
 import json
 from openai import OpenAI
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, session
 from app.tree import build_concept_tree, plot_tree
 from app.settings import model_choice, API_KEY, base_url, create_model_instructions
 
@@ -32,6 +32,9 @@ def generate_tree():
     if not number:
         number = 5
 
+    # Store number in the session for retrieval in subsequent graph creations.
+    session['number'] = number
+
     depth = 0
 
     response = client.chat.completions.create(
@@ -62,14 +65,16 @@ def explore_node(node_id):
     """
     Explore a specific node and generate a subgraph for it.
     """
+    if not node_id:
+        return
     if not graph_stack:
         return jsonify({"error": "No graph to explore"}), 400
 
-    if len(graph_stack) > max_depth:
-        return jsonify({"error": "Max depth exceeded"}), 400
+    if 'number' in session:
+        number = session['number']
+    else:
+        number = 5
 
-    data = request.json
-    number = data.get("number", "5")
     print(node_id)
 
     # Get the current graph and build a subgraph
@@ -77,8 +82,10 @@ def explore_node(node_id):
     current_depth = current_state["depth"]
     # parent_graph = current_state["tree"]
 
-    if current_depth > max_depth:
-        return jsonify({"error": "Max depth exceeded"}), 400
+    if current_depth >= max_depth:
+        return jsonify({"error": "Maximum concept depth exceeded. Make sure you understand "
+                                 "the foundations of the original topic before going "
+                                 "deeper.".format()}), 400
 
     response = client.chat.completions.create(
         model=model_choice,

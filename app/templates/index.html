@@ -35,10 +35,14 @@
 
             const plotResponse = await explore_node_response.json();
             console.log(plotResponse)
-            Plotly.newPlot("treePlot", plotResponse.data, plotResponse.layout);
 
-            // Re-register the click listener after re-rendering the plot
-            registerPlotlyClickListener();
+            if (plotResponse.error) {
+                alert(plotResponse.error);
+            } else {
+                Plotly.newPlot("treePlot", plotResponse.data, plotResponse.layout);
+                // Re-register the click listener after re-rendering the plot
+                registerPlotlyClickListener();
+            }
         });
     }
 
