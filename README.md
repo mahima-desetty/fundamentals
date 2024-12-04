@@ -3,10 +3,17 @@ New knowledge builds off of prior knowledge (whether the prior knowledge is acce
 This application uses an LLM to generate a set of fundamentals, or prerequisite knowledge, to
 understand a  given topic.
 
-Probably  will need to run `pip install -r requirements.txt`,
-Add some string to `app.secret_key=` in the app/__init__.py file,
-Run the app using `python run.py`,
-And access the UI at `http://127.0.0.1:5000/api/index`. 
+**Instructions**
+
+1. Add a string to `app.secret_key=` in the `app/__init__.py` file.
+2. Command line prompts:
+```shell
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 run.py
+```
+3. Access the UI at `http://127.0.0.1:5000/api/index`. 
 
 ![image1](img/one.png)
 ![image2](img/two.png)
