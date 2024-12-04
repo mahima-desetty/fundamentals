@@ -13,7 +13,7 @@ client = OpenAI(
 
 # In-memory stack to store graph states
 graph_stack = []
-max_depth = 5
+max_depth = 10
 
 
 @api_bp.route('/index')
@@ -28,8 +28,8 @@ def generate_tree():
     if not topic:
         return jsonify({"error": "Topic is required"}), 400
 
-    number = int(data.get("number", ""))
-    if not number:
+    number = data.get("number")
+    if not number or number == "" or int(number) < 1:
         number = 5
 
     # Store number in the session for retrieval in subsequent graph creations.
@@ -68,7 +68,7 @@ def explore_node(node_id):
     if not node_id:
         return
     if not graph_stack:
-        return jsonify({"error": "No graph to explore"}), 400
+        return jsonify({"error": "No graph to explore. Try refreshing the page."}), 400
 
     if 'number' in session:
         number = session['number']
@@ -124,4 +124,5 @@ def go_back():
         fig = plot_tree(parent_state["tree"], parent_state["node_data"])
         return jsonify(fig.to_dict())
     return jsonify({"error": "No parent graph to return to. Start by entering "
-                             "a concept in the topic box above."}), 400
+                             "a concept in the topic box above or clicking through "
+                             "some of the nodes in the graph."}), 400

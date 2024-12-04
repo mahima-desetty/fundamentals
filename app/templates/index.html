@@ -6,10 +6,19 @@
 </head>
 <body>
 <h1>Concept Graph Tool</h1>
+
+<h3><i>"We're all alike in our infinite ignorance" - Karl Popper</i></h3>
+
+<p>This tool will help provide a set of fundamentals for any concept you provide it. You can specify
+    the number of fundamentals the graph should generate (if not specified, the default is 5). Once the
+    graph has generated, hover over a node to learn more about it. Click on the node to generate a
+    concept graph of the selected node. You can click 'Go back' to return to a parent graph once you've
+    clicked on any node(s). The limit on the number of nodes that can be clicked is 10.
+</p>
 <form id="topicForm">
-    <input type="text" id="topic" name="topic" placeholder="Enter a topic" required>
-    <input type="number" id="number" name="number" placeholder="Optional number of concepts?">
-    <button type="submit">Generate Tree</button>
+    <input type="text" id="topic" name="topic" style="width:25ch" placeholder="Enter a topic..." required>
+    <input type="number" id="number" name="number" style="width:26ch" placeholder="Number of concepts (optional)">
+    <button type="submit">Generate concept graph</button>
 </form>
 <div id="treePlot"></div>
 <button id="goBack" onclick="goBack()">Go back</button>

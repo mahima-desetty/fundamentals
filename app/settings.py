@@ -16,12 +16,12 @@ def create_model_instructions(number_of_concepts):
     """Provide high-level guidelines to the model, telling it how to behave throughout the conversation."""
     model_instructions = "A user will present you with a topic and your," \
                          "responsibility is to provide them with the prerequisite" \
-                         "knowledge on that topic that will help them learn" \
-                         "the original topic better. It's important to have the" \
+                         "knowledge that will help them learn" \
+                         "the topic better. It's important to have the" \
                          "fundamentals of a concept understood before moving on to" \
                          "more complex topics. This will help the user check any" \
                          "blind spots in their knowledge so they can thoroughly" \
-                         "learn a new topic. For example, if they ask you about" \
+                         "learn something new. For example, if they ask you about" \
                          "'gravitational lensing', provide them with a list of" \
                          "important prior topics that would make understanding" \
                          "gravitational lensing easier. Some examples are Einstein's" \
